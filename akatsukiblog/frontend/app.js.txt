@@ -1,0 +1,63 @@
+const API = 'https://SUA_URL_BACKEND';
+
+// Carregar posts
+function carregarPosts(){
+  fetch(API+'/posts').then(r=>r.json()).then(posts=>{
+    const div = document.getElementById('posts');
+    div.innerHTML='';
+    posts.forEach(p=>{
+      const postDiv=document.createElement('div');
+      postDiv.classList.add('post');
+      postDiv.innerHTML=`<h3>${p.title}</h3><p>${p.content}</p>
+      <p>Likes: <span id="likes-${p._id}">${p.likes}</span>
+      <button onclick="darLike('${p._id}')">??</button></p>
+      <div class="comments" id="comments-${p._id}"></div>
+      <input id="cmt-${p._id}" placeholder="Seu nome">
+      <textarea id="cmttext-${p._id}" placeholder="Comentário"></textarea>
+      <button onclick="adicionarComentario('${p._id}')">Comentar</button>`;
+      div.appendChild(postDiv);
+      carregarComentarios(p._id);
+    });
+  });
+}
+
+function darLike(id){
+  fetch(API+'/posts/like/'+id,{ method:'PUT' }).then(()=>carregarPosts());
+}
+
+function carregarComentarios(postId){
+  fetch(API+'/comments/'+postId).then(r=>r.json()).then(comments=>{
+    const div = document.getElementById('comments-'+postId);
+    div.innerHTML='';
+    comments.forEach(c=>{
+      const p=document.createElement('p');
+      p.textContent=`${c.username}: ${c.content}`;
+      div.appendChild(p);
+    });
+  });
+}
+
+function adicionarComentario(postId){
+  const username = document.getElementById('cmt-'+postId).value;
+  const content = document.getElementById('cmttext-'+postId).value;
+  if(!username || !content) return alert('Preencha nome e comentário');
+  fetch(API+'/comments', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({postId,username,content})
+  }).then(()=> carregarComentarios(postId));
+}
+
+function enviarMensagem(){
+  const name=document.getElementById('msgName').value;
+  const email=document.getElementById('msgEmail').value;
+  const content=document.getElementById('msgContent').value;
+  if(!name||!email||!content) return alert('Preencha todos os campos');
+  fetch(API+'/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({name,email,content})
+  }).then(()=>alert('Mensagem enviada!'));
+}
+
+carregarPosts();

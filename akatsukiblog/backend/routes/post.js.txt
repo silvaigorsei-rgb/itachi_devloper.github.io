@@ -1,0 +1,25 @@
+const router = require('express').Router();
+const Post = require('../models/Post');
+
+// Listar posts
+router.get('/', async (req,res)=> {
+  const posts = await Post.find().sort({createdAt:-1});
+  res.json(posts);
+});
+
+// Criar post
+router.post('/', async (req,res)=> {
+  const p = new Post({ title:req.body.title, content:req.body.content });
+  await p.save();
+  res.json({ message:'Post criado' });
+});
+
+// Dar like
+router.put('/like/:id', async (req,res)=> {
+  const post = await Post.findById(req.params.id);
+  post.likes++;
+  await post.save();
+  res.json({ message:'Like adicionado', likes: post.likes });
+});
+
+module.exports = router;
