@@ -1,154 +1,82 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Neon Red</title>
+.ban { background: #400; }
 
-<style>
-/* RESET */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Segoe UI', Arial, sans-serif;
+
+footer {
+text-align: center;
+padding: 15px;
+border-top: 1px solid var(--red);
+opacity: 0.6;
 }
 
-body {
-  background: #000;
-  color: #ff1a1a;
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
 
-/* CONTAINER */
-.container {
-  text-align: center;
-  animation: fadeIn 2s ease forwards;
-}
-
-/* TEXTO NEON */
-.neon-text {
-  font-size: 4rem;
-  letter-spacing: 4px;
-  color: #ff1a1a;
-  text-shadow:
-    0 0 5px #ff1a1a,
-    0 0 10px #ff1a1a,
-    0 0 20px #ff0000,
-    0 0 40px #ff0000;
-  animation: neonPulse 1.5s infinite alternate;
-}
-
-/* SUBTEXTO */
-.subtitle {
-  margin-top: 20px;
-  font-size: 1.2rem;
-  opacity: 0.8;
-  animation: slideUp 2s ease forwards;
-}
-
-/* BOTÃO */
-.neon-button {
-  margin-top: 40px;
-  padding: 15px 40px;
-  font-size: 1rem;
-  color: #ff1a1a;
-  background: transparent;
-  border: 2px solid #ff1a1a;
-  cursor: pointer;
-  text-transform: uppercase;
-  letter-spacing: 3px;
-  transition: 0.3s;
-  box-shadow: 0 0 10px #ff1a1a;
-}
-
-.neon-button:hover {
-  background: #ff1a1a;
-  color: #000;
-  box-shadow:
-    0 0 10px #ff1a1a,
-    0 0 30px #ff0000,
-    0 0 60px #ff0000;
-}
-
-/* LINHAS ANIMADAS */
-.lines {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-
-.line {
-  position: absolute;
-  width: 2px;
-  height: 100%;
-  background: linear-gradient(transparent, #ff1a1a, transparent);
-  animation: moveLine 3s linear infinite;
-  opacity: 0.3;
-}
-
-.line:nth-child(1) { left: 20%; animation-delay: 0s; }
-.line:nth-child(2) { left: 50%; animation-delay: 1s; }
-.line:nth-child(3) { left: 80%; animation-delay: 2s; }
-
-/* ANIMAÇÕES */
-@keyframes neonPulse {
-  from {
-    text-shadow:
-      0 0 5px #ff1a1a,
-      0 0 10px #ff1a1a,
-      0 0 20px #ff0000;
-  }
-  to {
-    text-shadow:
-      0 0 10px #ff1a1a,
-      0 0 20px #ff1a1a,
-      0 0 40px #ff0000,
-      0 0 80px #ff0000;
-  }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideUp {
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 0.8;
-  }
-}
-
-@keyframes moveLine {
-  from { top: -100%; }
-  to { top: 100%; }
+@media (max-width: 800px) {
+main { grid-template-columns: 1fr; }
 }
 </style>
 </head>
-
 <body>
 
-<div class="lines">
-  <div class="line"></div>
-  <div class="line"></div>
-  <div class="line"></div>
-</div>
 
-<div class="container">
-  <div class="neon-text">NEON RED</div>
-  <div class="subtitle">Alta voltagem visual. Impacto máximo.</div>
-  <button class="neon-button">Entrar</button>
-</div>
+<header>
+<img src="https://upload.wikimedia.org/wikipedia/commons/5/5a/Akatsuki_logo.svg" alt="Akatsuki" />
+<h1>Painel Akatsuki</h1>
+</header>
+
+
+<main>
+<section>
+<h2>📄 Monitorar Conteúdo</h2>
+<textarea id="content" rows="5" placeholder="Digite o conteúdo do usuário..."></textarea>
+<button onclick="adicionarConteudo()">Adicionar Conteúdo</button>
+<ul id="listaConteudo"></ul>
+</section>
+
+
+<section>
+<h2>👤 Gerenciar Usuários</h2>
+<input id="usuario" placeholder="Nome do usuário" />
+<button onclick="banirUsuario()">Banir Usuário</button>
+<ul id="listaUsuarios"></ul>
+</section>
+</main>
+
+
+<footer>
+☁ Akatsuki controla tudo nas sombras ☁
+</footer>
+
+
+<script>
+const listaConteudo = document.getElementById('listaConteudo');
+const listaUsuarios = document.getElementById('listaUsuarios');
+
+
+function adicionarConteudo() {
+const texto = document.getElementById('content').value;
+if (!texto) return alert('Conteúdo vazio');
+
+
+const li = document.createElement('li');
+li.textContent = texto;
+listaConteudo.appendChild(li);
+document.getElementById('content').value = '';
+}
+
+
+function banirUsuario() {
+const nome = document.getElementById('usuario').value;
+if (!nome) return alert('Digite o nome do usuário');
+
+
+const li = document.createElement('li');
+li.className = 'ban';
+li.innerHTML = `<span>${nome}</span><strong>🚫 BANIDO</strong>`;
+listaUsuarios.appendChild(li);
+document.getElementById('usuario').value = '';
+}
+</script>
+
 
 </body>
 </html>
