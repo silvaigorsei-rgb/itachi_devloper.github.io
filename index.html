@@ -1,171 +1,123 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <title>Painel Akatsuki</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    :root {
-      --red: #c1121f;
-      --dark: #0b0b0b;
-      --cloud: #f5f5f5;
-      --gray: #1a1a1a;
-    }
-
-    * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-
-    body {
-      margin: 0;
-      background: radial-gradient(circle at top, #1a0000, var(--dark));
-      color: var(--cloud);
-    }
-
-    header {
-      padding: 20px;
-      background: linear-gradient(90deg, #000, var(--gray));
-      border-bottom: 3px solid var(--red);
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-
-    header img {
-      width: 60px;
-      filter: drop-shadow(0 0 5px red);
-    }
-
-    header h1 {
-      color: var(--red);
-      margin: 0;
-      letter-spacing: 2px;
-    }
-
-    main {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-      padding: 20px;
-    }
-
-    section {
-      background: rgba(0,0,0,0.7);
-      border: 1px solid var(--red);
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 0 15px rgba(193,18,31,0.3);
-    }
-
-    h2 {
-      color: var(--red);
-      margin-top: 0;
-    }
-
-    input, textarea, button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      border-radius: 6px;
-      border: none;
-      outline: none;
-    }
-
-    input, textarea {
-      background: #111;
-      color: white;
-      border: 1px solid #333;
-    }
-
-    button {
-      background: var(--red);
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    button:hover { background: #ff1e2d; }
-
-    ul {
-      list-style: none;
-      padding: 0;
-    }
-
-    li {
-      background: #111;
-      margin-top: 10px;
-      padding: 10px;
-      border-left: 4px solid var(--red);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .ban { background: #400; }
-
-    footer {
-      text-align: center;
-      padding: 15px;
-      border-top: 1px solid var(--red);
-      opacity: 0.6;
-    }
-
-    @media (max-width: 800px) {
-      main { grid-template-columns: 1fr; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Animação de Coração</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #000;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
 </head>
 <body>
+    <canvas id="heartCanvas"></canvas>
 
-<header>
-  <img src="https://upload.wikimedia.org/wikipedia/commons/5/5a/Akatsuki_logo.svg" alt="Akatsuki" />
-  <h1>Painel Akatsuki</h1>
-</header>
+    <script>
+        const canvas = document.getElementById('heartCanvas');
+        const ctx = canvas.getContext('2d');
 
-<main>
-  <section>
-    <h2>📄 Monitorar Conteúdo</h2>
-    <textarea id="content" rows="5" placeholder="Digite o conteúdo do usuário..."></textarea>
-    <button onclick="adicionarConteudo()">Adicionar Conteúdo</button>
-    <ul id="listaConteudo"></ul>
-  </section>
+        let width, height;
+        let e = []; // Array de partículas
+        const heartPointsCount = 100; // Quantidade de pontos principais
+        const traceCount = 20;       // Tamanho do rastro
+        const rand = Math.random;
 
-  <section>
-    <h2>👤 Gerenciar Usuários</h2>
-    <input id="usuario" placeholder="Nome do usuário" />
-    <button onclick="banirUsuario()">Banir Usuário</button>
-    <ul id="listaUsuarios"></ul>
-  </section>
-</main>
+        const config = {
+            traceK: 0.4,
+            timeDelta: 0.01
+        };
 
-<footer>
-  ☁ Akatsuki controla tudo nas sombras ☁
-</footer>
+        // Função para calcular a posição no formato de coração
+        const heartPos = (t) => {
+            return {
+                x: 160 * Math.pow(Math.sin(t), 3),
+                y: 130 * Math.cos(t) - 50 * Math.cos(2 * t) - 20 * Math.cos(3 * t) - 10 * Math.cos(4 * t)
+            };
+        };
 
-<script>
-  const listaConteudo = document.getElementById('listaConteudo');
-  const listaUsuarios = document.getElementById('listaUsuarios');
+        function init() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            e = [];
 
-  function adicionarConteudo() {
-    const texto = document.getElementById('content').value;
-    if (!texto) return alert('Conteúdo vazio');
+            for (let i = 0; i < heartPointsCount; i++) {
+                let x = rand() * width;
+                let y = rand() * height;
+                
+                e[i] = {
+                    vx: 0,
+                    vy: 0,
+                    R: 2,
+                    speed: rand() + 5,
+                    q: ~~(rand() * heartPointsCount),
+                    D: 2 * (i % 2) - 1,
+                    force: 0.2 * rand() + 0.7,
+                    // Cor baseada no HSLA (tons de vermelho/rosa)
+                    f: "hsla(0," + ~~(40 * rand() + 60) + "%," + ~~(60 * rand() + 20) + "%,.3)",
+                    trace: []
+                };
 
-    const li = document.createElement('li');
-    li.textContent = texto;
-    listaConteudo.appendChild(li);
-    document.getElementById('content').value = '';
-  }
+                for (let k = 0; k < traceCount; k++) {
+                    e[i].trace[k] = { x: x, y: y };
+                }
+            }
+        }
 
-  function banirUsuario() {
-    const nome = document.getElementById('usuario').value;
-    if (!nome) return alert('Digite o nome do usuário');
+        function loop() {
+            // Efeito de fade para o rastro
+            ctx.fillStyle = "rgba(0,0,0,0.1)";
+            ctx.fillRect(0, 0, width, height);
 
-    const li = document.createElement('li');
-    li.className = 'ban';
-    li.innerHTML = `<span>${nome}</span><strong>🚫 BANIDO</strong>`;
-    listaUsuarios.appendChild(li);
-    document.getElementById('usuario').value = '';
-  }
-</script>
+            // Tempo para animação
+            const time = Date.now() * 0.001;
 
+            for (let i = 0; i < e.length; i++) {
+                const p = e[i];
+                
+                // Cálculo da posição alvo (formato de coração)
+                const t = i / heartPointsCount * Math.PI * 2;
+                const target = heartPos(t);
+                
+                // Ajuste para o centro da tela e pulsação
+                const pulse = 1 + 0.1 * Math.sin(time * 3);
+                const tx = target.x * pulse + width / 2;
+                const ty = -target.y * pulse + height / 2;
+
+                // Física básica (aceleração em direção ao alvo)
+                p.vx += (tx - p.trace[0].x) * config.traceK * config.timeDelta;
+                p.vy += (ty - p.trace[0].y) * config.traceK * config.timeDelta;
+                
+                p.trace[0].x += p.vx;
+                p.trace[0].y += p.vy;
+
+                // Atrito para suavizar o movimento
+                p.vx *= 0.94;
+                p.vy *= 0.94;
+
+                // Atualiza o rastro (seguindo o ponto principal)
+                for (let k = traceCount - 1; k > 0; k--) {
+                    p.trace[k].x = p.trace[k - 1].x;
+                    p.trace[k].y = p.trace[k - 1].y;
+                }
+
+                // Desenha a partícula e seu rastro
+                ctx.fillStyle = p.f;
+                for (let k = 0; k < traceCount; k++) {
+                    ctx.fillRect(p.trace[k].x, p.trace[k].y, 1, 1);
+                }
+            }
+
+            requestAnimationFrame(loop);
+        }
+
+        window.addEventListener('resize', init);
+        init();
+        loop();
+    </script>
 </body>
 </html>
