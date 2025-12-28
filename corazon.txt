@@ -1,130 +1,112 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <title>Animação de Coração</title>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            background-color: #000;
-        }
-        canvas {
-            display: block;
-        }
-    </style>
+<meta charset="UTF-8">
+<title>I Love You Hermione</title>
+<style>
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: black;
+}
+canvas {
+    display: block;
+}
+</style>
 </head>
 <body>
-    <canvas id="heartCanvas"></canvas>
 
-    <script>
-        const canvas = document.getElementById('heartCanvas');
-        const ctx = canvas.getContext('2d');
+<canvas id="heartCanvas"></canvas>
 
-        let width, height;
-        let e = []; // Array de partículas
-        const heartPointsCount = 100; // Quantidade de pontos principais
-        const traceCount = 20;       // Tamanho do rastro
-        const rand = Math.random;
+<script>
+const canvas = document.getElementById("heartCanvas");
+const ctx = canvas.getContext("2d");
 
-        const config = {
-            traceK: 0.4,
-            timeDelta: 0.01
-        };
+let w, h;
+const particles = [];
+const POINTS = 220;
+const TRAIL = 30;
 
-        // Função para calcular a posição no formato de coração
-        const heartPos = (t) => {
-            return {
-                x: 160 * Math.pow(Math.sin(t), 3),
-                y: 130 * Math.cos(t) - 50 * Math.cos(2 * t) - 20 * Math.cos(3 * t) - 10 * Math.cos(4 * t)
-            };
-        };
+const heart = t => ({
+    x: 16 * Math.pow(Math.sin(t), 3),
+    y: 13 * Math.cos(t) - 5 * Math.cos(2*t)
+       - 2 * Math.cos(3*t) - Math.cos(4*t)
+});
 
-        function init() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-            e = [];
+function resize() {
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+}
+window.addEventListener("resize", resize);
+resize();
 
-            for (let i = 0; i < heartPointsCount; i++) {
-                let x = rand() * width;
-                let y = rand() * height;
-                
-                e[i] = {
-                    vx: 0,
-                    vy: 0,
-                    R: 2,
-                    speed: rand() + 5,
-                    q: ~~(rand() * heartPointsCount),
-                    D: 2 * (i % 2) - 1,
-                    force: 0.2 * rand() + 0.7,
-                    // Cor baseada no HSLA (tons de vermelho/rosa)
-                    f: "hsla(0," + ~~(40 * rand() + 60) + "%," + ~~(60 * rand() + 20) + "%,.3)",
-                    trace: []
-                };
+for (let i = 0; i < POINTS; i++) {
+    const x = Math.random() * w;
+    const y = Math.random() * h;
+    particles.push({
+        x, y, vx: 0, vy: 0,
+        trail: Array.from({length: TRAIL}, () => ({x, y})),
+        color: `hsla(${340 + Math.random()*20},90%,65%,0.45)`
+    });
+}
 
-                for (let k = 0; k < traceCount; k++) {
-                    e[i].trace[k] = { x: x, y: y };
-                }
-            }
-        }
+let startTime = Date.now();
 
-        function loop() {
-            // Efeito de fade para o rastro
-            ctx.fillStyle = "rgba(0,0,0,0.1)";
-            ctx.fillRect(0, 0, width, height);
+function drawText(time) {
+    const fade = Math.min((Date.now() - startTime) / 3000, 1);
+    const pulse = 1 + Math.sin(time * 3) * 0.05;
 
-            // Tempo para animação
-            const time = Date.now() * 0.001;
+    ctx.save();
+    ctx.globalAlpha = fade;
+    ctx.font = `${50 * pulse}px "Georgia", serif`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
 
-            for (let i = 0; i < e.length; i++) {
-                const p = e[i];
-                
-                // Cálculo da posição alvo (formato de coração)
-                const t = i / heartPointsCount * Math.PI * 2;
-                const target = heartPos(t);
-                
-                // Ajuste para o centro da tela e pulsação
-                const pulse = 1 + 0.1 * Math.sin(time * 3);
-                const tx = target.x * pulse + width / 2;
-                const ty = -target.y * pulse + height / 2;
+    ctx.shadowColor = "rgba(255, 80, 150, 0.9)";
+    ctx.shadowBlur = 25 + Math.sin(time * 4) * 10;
 
-                // Física básica (aceleração em direção ao alvo)
-                p.vx += (tx - p.trace[0].x) * config.traceK * config.timeDelta;
-                p.vy += (ty - p.trace[0].y) * config.traceK * config.timeDelta;
-                
-                p.trace[0].x += p.vx;
-                p.trace[0].y += p.vy;
+    ctx.fillStyle = "rgba(255,200,220,1)";
+    ctx.fillText("I love you Hermione", w/2, h/2);
+    ctx.restore();
+}
 
-                // Atrito para suavizar o movimento
-                p.vx *= 0.94;
-                p.vy *= 0.94;
+function animate() {
+    ctx.fillStyle = "rgba(0,0,0,0.12)";
+    ctx.fillRect(0,0,w,h);
 
-                // Atualiza o rastro (seguindo o ponto principal)
-                for (let k = traceCount - 1; k > 0; k--) {
-                    p.trace[k].x = p.trace[k - 1].x;
-                    p.trace[k].y = p.trace[k - 1].y;
-                }
+    const time = Date.now() * 0.001;
+    const beat = 1 + Math.sin(time * 3) * 0.12;
 
-                // Desenha a partícula e seu rastro
-                ctx.fillStyle = p.f;
-                for (let k = 0; k < traceCount; k++) {
-                    ctx.fillRect(p.trace[k].x, p.trace[k].y, 1, 1);
-                }
-            }
+    particles.forEach((p,i) => {
+        const t = i / POINTS * Math.PI * 2;
+        const target = heart(t);
 
-            requestAnimationFrame(loop);
-        }
+        const tx = target.x * 22 * beat + w/2;
+        const ty = -target.y * 22 * beat + h/2;
 
-        window.addEventListener('resize', init);
-        init();
-        loop();
-    </script>
+        p.vx += (tx - p.x) * 0.015;
+        p.vy += (ty - p.y) * 0.015;
+
+        p.x += p.vx;
+        p.y += p.vy;
+
+        p.vx *= 0.9;
+        p.vy *= 0.9;
+
+        p.trail.unshift({x: p.x, y: p.y});
+        p.trail.pop();
+
+        ctx.fillStyle = p.color;
+        p.trail.forEach(t => ctx.fillRect(t.x, t.y, 1, 1));
+    });
+
+    drawText(time);
+    requestAnimationFrame(animate);
+}
+
+animate();
+</script>
+
 </body>
-<!DOCTYPE html
 </html>
-<body
-    <script>
-    alert(Ilove you ecli)
-    </script> 
-    </body>
-    </html>
