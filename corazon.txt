@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Animação de Coração</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #000;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="heartCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('heartCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let width, height;
+        let e = []; // Array de partículas
+        const heartPointsCount = 100; // Quantidade de pontos principais
+        const traceCount = 20;       // Tamanho do rastro
+        const rand = Math.random;
+
+        const config = {
+            traceK: 0.4,
+            timeDelta: 0.01
+        };
+
+        // Função para calcular a posição no formato de coração
+        const heartPos = (t) => {
+            return {
+                x: 160 * Math.pow(Math.sin(t), 3),
+                y: 130 * Math.cos(t) - 50 * Math.cos(2 * t) - 20 * Math.cos(3 * t) - 10 * Math.cos(4 * t)
+            };
+        };
+
+        function init() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            e = [];
+
+            for (let i = 0; i < heartPointsCount; i++) {
+                let x = rand() * width;
+                let y = rand() * height;
+                
+                e[i] = {
+                    vx: 0,
+                    vy: 0,
+                    R: 2,
+                    speed: rand() + 5,
+                    q: ~~(rand() * heartPointsCount),
+                    D: 2 * (i % 2) - 1,
+                    force: 0.2 * rand() + 0.7,
+                    // Cor baseada no HSLA (tons de vermelho/rosa)
+                    f: "hsla(0," + ~~(40 * rand() + 60) + "%," + ~~(60 * rand() + 20) + "%,.3)",
+                    trace: []
+                };
+
+                for (let k = 0; k < traceCount; k++) {
+                    e[i].trace[k] = { x: x, y: y };
+                }
+            }
+        }
+
+        function loop() {
+            // Efeito de fade para o rastro
+            ctx.fillStyle = "rgba(0,0,0,0.1)";
+            ctx.fillRect(0, 0, width, height);
+
+            // Tempo para animação
+            const time = Date.now() * 0.001;
+
+            for (let i = 0; i < e.length; i++) {
+                const p = e[i];
+                
+                // Cálculo da posição alvo (formato de coração)
+                const t = i / heartPointsCount * Math.PI * 2;
+                const target = heartPos(t);
+                
+                // Ajuste para o centro da tela e pulsação
+                const pulse = 1 + 0.1 * Math.sin(time * 3);
+                const tx = target.x * pulse + width / 2;
+                const ty = -target.y * pulse + height / 2;
+
+                // Física básica (aceleração em direção ao alvo)
+                p.vx += (tx - p.trace[0].x) * config.traceK * config.timeDelta;
+                p.vy += (ty - p.trace[0].y) * config.traceK * config.timeDelta;
+                
+                p.trace[0].x += p.vx;
+                p.trace[0].y += p.vy;
+
+                // Atrito para suavizar o movimento
+                p.vx *= 0.94;
+                p.vy *= 0.94;
+
+                // Atualiza o rastro (seguindo o ponto principal)
+                for (let k = traceCount - 1; k > 0; k--) {
+                    p.trace[k].x = p.trace[k - 1].x;
+                    p.trace[k].y = p.trace[k - 1].y;
+                }
+
+                // Desenha a partícula e seu rastro
+                ctx.fillStyle = p.f;
+                for (let k = 0; k < traceCount; k++) {
+                    ctx.fillRect(p.trace[k].x, p.trace[k].y, 1, 1);
+                }
+            }
+
+            requestAnimationFrame(loop);
+        }
+
+        window.addEventListener('resize', init);
+        init();
+        loop();
+    </script>
+</body>
+<!DOCTYPE html
+</html>
+<body
+    <script>
+    alert(Ilove you ecli)
+    </script> 
+    </body>
+    </html>
