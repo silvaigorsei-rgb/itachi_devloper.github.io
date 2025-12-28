@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Painel Akatsuki</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --red: #c1121f;
+      --dark: #0b0b0b;
+      --cloud: #f5f5f5;
+      --gray: #1a1a1a;
+    }
+
+    * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top, #1a0000, var(--dark));
+      color: var(--cloud);
+    }
+
+    header {
+      padding: 20px;
+      background: linear-gradient(90deg, #000, var(--gray));
+      border-bottom: 3px solid var(--red);
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    header img {
+      width: 60px;
+      filter: drop-shadow(0 0 5px red);
+    }
+
+    header h1 {
+      color: var(--red);
+      margin: 0;
+      letter-spacing: 2px;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      padding: 20px;
+    }
+
+    section {
+      background: rgba(0,0,0,0.7);
+      border: 1px solid var(--red);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 0 15px rgba(193,18,31,0.3);
+    }
+
+    h2 {
+      color: var(--red);
+      margin-top: 0;
+    }
+
+    input, textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: none;
+      outline: none;
+    }
+
+    input, textarea {
+      background: #111;
+      color: white;
+      border: 1px solid #333;
+    }
+
+    button {
+      background: var(--red);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover { background: #ff1e2d; }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      background: #111;
+      margin-top: 10px;
+      padding: 10px;
+      border-left: 4px solid var(--red);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .ban { background: #400; }
+
+    footer {
+      text-align: center;
+      padding: 15px;
+      border-top: 1px solid var(--red);
+      opacity: 0.6;
+    }
+
+    @media (max-width: 800px) {
+      main { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/5/5a/Akatsuki_logo.svg" alt="Akatsuki" />
+  <h1>Painel Akatsuki</h1>
+</header>
+
+<main>
+  <section>
+    <h2>📄 Monitorar Conteúdo</h2>
+    <textarea id="content" rows="5" placeholder="Digite o conteúdo do usuário..."></textarea>
+    <button onclick="adicionarConteudo()">Adicionar Conteúdo</button>
+    <ul id="listaConteudo"></ul>
+  </section>
+
+  <section>
+    <h2>👤 Gerenciar Usuários</h2>
+    <input id="usuario" placeholder="Nome do usuário" />
+    <button onclick="banirUsuario()">Banir Usuário</button>
+    <ul id="listaUsuarios"></ul>
+  </section>
+</main>
+
+<footer>
+  ☁ Akatsuki controla tudo nas sombras ☁
+</footer>
+
+<script>
+  const listaConteudo = document.getElementById('listaConteudo');
+  const listaUsuarios = document.getElementById('listaUsuarios');
+
+  function adicionarConteudo() {
+    const texto = document.getElementById('content').value;
+    if (!texto) return alert('Conteúdo vazio');
+
+    const li = document.createElement('li');
+    li.textContent = texto;
+    listaConteudo.appendChild(li);
+    document.getElementById('content').value = '';
+  }
+
+  function banirUsuario() {
+    const nome = document.getElementById('usuario').value;
+    if (!nome) return alert('Digite o nome do usuário');
+
+    const li = document.createElement('li');
+    li.className = 'ban';
+    li.innerHTML = `<span>${nome}</span><strong>🚫 BANIDO</strong>`;
+    listaUsuarios.appendChild(li);
+    document.getElementById('usuario').value = '';
+  }
+</script>
+
+</body>
+</html>
